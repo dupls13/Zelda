@@ -1,8 +1,10 @@
 import pygame 
 from settings import *
+from random import choice 
 
 from tile import Tile 
 from player import Player
+from support import *
 
 
 
@@ -22,6 +24,35 @@ class Level:
         self.create_map()
 
     def create_map(self):
+        layouts = {
+            'boundary': import_csv_layout('map/map_FloorBlocks.csv'),
+            'grass': import_csv_layout('map/map_Grass.csv'),
+            'object': import_csv_layout('map/map_Objects.csv')
+        }
+        graphics = {
+            'grass': import_folder('graphics/Grass'),
+            'objects': import_folder('graphics/objects')
+        }
+        print(graphics)
+
+        for style, layout in layouts.items():
+            for row_index, row in enumerate(layout):
+                for column_index, column in enumerate(row):
+                    if column != '-1':
+                        x = column_index * TILESIZE
+                        y = row_index * TILESIZE
+
+                        if style == 'boundary':
+                            Tile((x,y), [self.obstacle_sprites], 'invisible')
+                        if style == 'grass':
+                            random_grass_image = choice(graphics['grass'])
+                            Tile((x,y), [self.visible_sprites, self.obstacle_sprites], 'grass', random_grass_image)
+                        if style == 'object':
+                            surface = graphics['objects'][int(column)]
+                            Tile((x,y), [self.visible_sprites, self.obstacle_sprites], 'object', surface)
+
+
+
         # looks at each value in world map 
         """ for row_index, row in enumerate(WORLD_MAP):
             for column_index, column in enumerate(row):
